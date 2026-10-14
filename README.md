@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SolarSizer AI
 
-## Getting Started
+**Right-size your solar. Kill the generator bill.**
 
-First, run the development server:
+Global Energy Hackathon 2026, Digital Solutions, Apps & AI/ML track.
+
+## Problem
+
+Millions of Nigerian homes and shops run petrol generators because the grid fails daily. Solar is the answer, but buying it is guesswork: installers quote wildly different systems, undersized systems die before midnight, oversized ones waste money, and nobody shows when the system pays for itself.
+
+## How it works
+
+1. **AI parse.** You describe what you own in plain words ("1 freezer, 2 standing fans, a TV and 6 bulbs"). An LLM on the NVIDIA API turns that into an appliance list (watts, hours, quantity, motor). You can edit every row.
+2. **Sizing engine.** Pure TypeScript, unit-tested. The AI never does the math.
+3. **Sun data.** Annual peak sun hours for your city from NASA POWER, so Kano and Lagos get different panel counts.
+4. **Price and payback.** System cost from a local price table, compared with your weekly petrol spend to get the payback month.
+
+### Formulas
+
+| Value | Formula |
+|-------|---------|
+| Daily energy | Σ watts × hours × qty |
+| Inverter | max(peak W × 1.25, surge W ÷ 2) ÷ 0.8 power factor, rounded up to a standard kVA |
+| Surge | motor loads (fridges, freezers, pumps, AC) count 3× |
+| Battery | daily Wh × 0.5 night share ÷ (0.8 depth of discharge × 0.9 efficiency), rounded up to a standard kWh |
+| Panels | daily Wh ÷ (sun hours × 0.75 derate) ÷ 550 W, rounded up |
+| Payback | total cost ÷ (weekly fuel × 52 ÷ 12), in months |
+
+## Data sources and credits
+
+- **AI:** `meta/llama-3.3-70b-instruct` via NVIDIA API Catalog (build.nvidia.com), OpenAI-compatible endpoint.
+- **Sun hours:** NASA POWER climatology API, parameter `ALLSKY_SFC_SW_DWN` (annual mean). Falls back to an approximate value per city if NASA is unreachable, labelled "estimate".
+- **Prices:** `lib/prices.json`. Placeholder Lagos retail estimates; replace with researched prices and their date before demo.
+
+## Run locally
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env.local   # then paste your NVIDIA key into .env.local
+npm run dev                  # http://localhost:3000
+npm test                     # unit tests
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Get a free NVIDIA key at https://build.nvidia.com (sign in, open a model page, "Get API Key"). Keys start with `nvapi-`. Never commit `.env.local`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deploy
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Import the repo on Vercel and set the environment variable `NVIDIA_API_KEY`. Optional: `NVIDIA_MODEL` to switch models.
 
-## Learn More
+## Limits
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Prices and sizes are estimates for planning, not an installer's quote. The free NVIDIA tier is rate-limited (about 40 requests per minute reported by developers); the app makes one AI call per "Size my system" click.
