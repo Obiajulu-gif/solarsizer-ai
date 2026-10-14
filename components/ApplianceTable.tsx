@@ -14,13 +14,13 @@ export default function ApplianceTable({ appliances, onChange }: Props) {
     onChange(appliances.map((a, j) => (j === i ? { ...a, ...patch } : a)));
 
   return (
-    <div className="rounded-2xl border border-line bg-panel p-4">
-      <div className="mb-3 flex items-center justify-between">
-        <h2 className="font-bold">Your appliances</h2>
-        <span className="text-sm text-muted">Edit any value, results update instantly</span>
+    <div className="rounded-3xl bg-panel p-6 shadow-[0_1px_0_#ead9bd,0_20px_40px_-24px_rgba(120,80,20,0.35)]">
+      <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
+        <h3 className="font-display text-xl font-bold">What the AI read from your list</h3>
+        <span className="text-muted">Change any number and the results above update</span>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[560px] text-sm">
+        <table className="w-full min-w-[560px]">
           <thead className="text-left text-muted">
             <tr>
               <th className="py-1 font-medium">Appliance</th>
@@ -54,7 +54,7 @@ export default function ApplianceTable({ appliances, onChange }: Props) {
                   <input aria-label="Has a motor" type="checkbox" checked={a.motor} onChange={(e) => update(i, { motor: e.target.checked })} />
                 </td>
                 <td>
-                  <button aria-label={`Remove ${a.name}`} className="px-2 text-bad" onClick={() => onChange(appliances.filter((_, j) => j !== i))}>
+                  <button aria-label={`Remove ${a.name}`} className="rounded-full px-2.5 py-1 text-bad hover:bg-bad/10" onClick={() => onChange(appliances.filter((_, j) => j !== i))}>
                     ✕
                   </button>
                 </td>
@@ -63,7 +63,7 @@ export default function ApplianceTable({ appliances, onChange }: Props) {
           </tbody>
         </table>
       </div>
-      <button className="mt-3 text-sm font-semibold text-amber"
+      <button className="mt-4 font-bold text-amber underline-offset-4 hover:underline"
         onClick={() => onChange([...appliances, { name: "New appliance", watts: 100, hours: 4, qty: 1, motor: false }])}>
         + Add appliance
       </button>
