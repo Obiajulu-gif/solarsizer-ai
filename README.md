@@ -28,7 +28,7 @@ Millions of Nigerian homes and shops run petrol generators because the grid fail
 
 ## Data sources and credits
 
-- **AI:** `meta/llama-3.3-70b-instruct` via NVIDIA API Catalog (build.nvidia.com), OpenAI-compatible endpoint.
+- **AI:** `openai/gpt-oss-20b` (default) via NVIDIA API Catalog (build.nvidia.com), OpenAI-compatible endpoint. Meta Llama models are geo-blocked in Nigeria; run `node scripts/check-models.mjs` to see which models answer from your location, then set `NVIDIA_MODEL`.
 - **Sun hours:** NASA POWER climatology API, parameter `ALLSKY_SFC_SW_DWN` (annual mean). Falls back to an approximate value per city if NASA is unreachable, labelled "estimate".
 - **Prices:** `lib/prices.json`. Placeholder Lagos retail estimates; replace with researched prices and their date before demo.
 

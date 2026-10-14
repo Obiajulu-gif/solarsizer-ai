@@ -8,10 +8,14 @@ export const nvidiaComplete: Complete = async (system, user) => {
   const apiKey = process.env.NVIDIA_API_KEY;
   if (!apiKey) throw new Error("NVIDIA_API_KEY is not set");
   client ??= new OpenAI({ apiKey, baseURL: "https://integrate.api.nvidia.com/v1" });
+  // gpt-oss-20b: available in Nigeria (Meta Llama models are geo-blocked there). Reasoning model, so it needs
+  // headroom in max_tokens for its hidden reasoning before the JSON answer.
+  const model = process.env.NVIDIA_MODEL ?? "openai/gpt-oss-20b";
   const res = await client.chat.completions.create({
-    model: process.env.NVIDIA_MODEL ?? "meta/llama-3.3-70b-instruct",
+    model,
     temperature: 0,
-    max_tokens: 800,
+    max_tokens: 2000,
+    ...(model.startsWith("openai/gpt-oss") ? { reasoning_effort: "low" as const } : {}),
     messages: [
       { role: "system", content: system },
       { role: "user", content: user },

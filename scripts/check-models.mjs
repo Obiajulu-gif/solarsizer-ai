@@ -11,17 +11,11 @@ if (!key?.startsWith("nvapi-")) {
 
 const BASE = "https://integrate.api.nvidia.com/v1";
 const CANDIDATES = [
-  "mistralai/mistral-small-24b-instruct",
-  "mistralai/mistral-medium-3-instruct",
-  "qwen/qwen2.5-7b-instruct",
-  "qwen/qwen3-235b-a22b",
-  "deepseek-ai/deepseek-v3.1",
-  "openai/gpt-oss-120b",
   "openai/gpt-oss-20b",
-  "moonshotai/kimi-k2-instruct",
-  "nvidia/llama-3.3-nemotron-super-49b-v1.5",
-  "google/gemma-3-27b-it",
-  "meta/llama-3.3-70b-instruct",
+  "deepseek-ai/deepseek-v4.1-flash",
+  "z-ai/glm-5.3-flash",
+  "nvidia/nemotron-3.5-lightning-30b-a3b",
+  "google/gemma-4-31b-it",
 ];
 
 const listed = new Set(
@@ -29,7 +23,7 @@ const listed = new Set(
 );
 
 const prompt =
-  'Reply with ONLY a JSON array: [{"name":"TV","watts":100,"hours":6,"qty":1,"motor":false}] for the text "one TV".';
+  "Extract appliances. Reply with ONLY a JSON array of {name, watts, hours, qty, motor}. Text: 1 freezer, 2 standing fans, a TV and 6 bulbs";
 for (const model of CANDIDATES) {
   if (listed.size && !listed.has(model)) { console.log(`skip   ${model} (not in catalog)`); continue; }
   const t = Date.now();
@@ -37,13 +31,13 @@ for (const model of CANDIDATES) {
     const res = await fetch(`${BASE}/chat/completions`, {
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ model, temperature: 0, max_tokens: 200, messages: [{ role: "user", content: prompt }] }),
-      signal: AbortSignal.timeout(30000),
+      body: JSON.stringify({ model, temperature: 0, max_tokens: 1500, messages: [{ role: "user", content: prompt }] }),
+      signal: AbortSignal.timeout(60000),
     });
     const body = await res.json().catch(() => ({}));
     const text = body.choices?.[0]?.message?.content ?? "";
     const ok = res.ok && text.includes("[");
-    console.log(`${ok ? "OK    " : "FAIL  "} ${model}  ${res.status}  ${Date.now() - t}ms  ${ok ? "" : JSON.stringify(body).slice(0, 120)}`);
+    console.log(`${ok ? "OK    " : "FAIL  "} ${model}  ${res.status}  ${Date.now() - t}ms  ${ok ? text.replace(/\s+/g, " ").slice(0, 160) : JSON.stringify(body).slice(0, 120)}`);
   } catch (e) {
     console.log(`FAIL   ${model}  ${e.name}`);
   }

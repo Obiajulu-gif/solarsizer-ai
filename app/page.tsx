@@ -1,97 +1,94 @@
-"use client";
+import Link from "next/link";
+import Sizer from "@/components/Sizer";
 
-import { useState } from "react";
-import ApplianceTable from "@/components/ApplianceTable";
-import ResultCards from "@/components/ResultCards";
-import { CITIES } from "@/lib/cities";
-import type { SunResult } from "@/lib/sun";
-import type { Appliance } from "@/lib/types";
+const PROBLEMS = [
+  { mark: "bg-bad", title: "Too small", body: "The battery is flat before midnight and the generator comes back on." },
+  { mark: "bg-sun", title: "Too big", body: "You pay for panels and batteries you never use. That money does not come back." },
+  { mark: "bg-amber", title: "No payback date", body: "Three installers, three quotes, and nobody tells you when solar starts saving you money." },
+];
 
-const DEMO = "1 freezer, 2 standing fans, a TV and 6 bulbs";
+const STEPS = [
+  { title: "Describe it", body: "Type what you own the way you would say it. The AI turns it into a list of appliances you can edit." },
+  { title: "Size it", body: "Tested formulas size the inverter for peak and start-up load, the battery for the night, and the panels for the day." },
+  { title: "Match your sun", body: "NASA satellite data gives the real sun hours for your city. Kano needs fewer panels than Lagos." },
+  { title: "Price it", body: "Costs come from a local price table, then we compare them with your petrol spend to find your payback month." },
+];
 
 export default function Home() {
-  const [text, setText] = useState("");
-  const [cityId, setCityId] = useState("lagos");
-  const [fuel, setFuel] = useState("");
-  const [appliances, setAppliances] = useState<Appliance[] | null>(null);
-  const [sun, setSun] = useState<SunResult | null>(null);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  async function loadSun(id: string) {
-    const res = await fetch(`/api/sun?city=${id}`);
-    setSun(await res.json());
-  }
-
-  async function size() {
-    setLoading(true);
-    setError("");
-    try {
-      const [parseRes] = await Promise.all([
-        fetch("/api/parse", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }) }),
-        loadSun(cityId),
-      ]);
-      const data = await parseRes.json();
-      if (!parseRes.ok) {
-        setError(data.error ?? "Something went wrong");
-        setAppliances((a) => a ?? []); // still allow manual entry
-      } else {
-        setAppliances(data.appliances);
-      }
-    } catch {
-      setError("Network error, check your connection and try again");
-    } finally {
-      setLoading(false);
-    }
-  }
-
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6">
-      <header className="mb-8">
-        <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl">
-          Solar<span className="text-amber">Sizer</span> AI
-        </h1>
-        <p className="mt-2 text-lg text-muted">Right-size your solar. Kill the generator bill.</p>
+    <div className="relative overflow-x-clip">
+      <div aria-hidden className="sun pointer-events-none absolute -right-40 top-[420px] h-[560px] w-[560px] rounded-full sm:-right-24 sm:top-[340px]" />
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-[640px] h-64 bg-gradient-to-b from-transparent via-[#ff7a1a]/10 to-transparent" />
+
+      <header className="relative mx-auto flex max-w-6xl items-center justify-between px-4 py-6 sm:px-6">
+        <Link href="/" className="font-display text-2xl font-extrabold tracking-tight">
+          SolarSizer <span className="text-amber">AI</span>
+        </Link>
+        <a href="#how" className="text-muted hover:text-foreground">How it works</a>
       </header>
 
-      <section className="mb-6 space-y-4 rounded-2xl border border-line bg-panel p-5">
-        <label className="block">
-          <span className="mb-1 block font-semibold">What do you want to power?</span>
-          <textarea className="w-full px-3 py-2" rows={3} maxLength={500} placeholder={DEMO}
-            value={text} onChange={(e) => setText(e.target.value)} />
-        </label>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <label className="block">
-            <span className="mb-1 block font-semibold">City</span>
-            <select className="w-full px-3 py-2" value={cityId}
-              onChange={(e) => { setCityId(e.target.value); if (appliances) loadSun(e.target.value); }}>
-              {CITIES.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </select>
-          </label>
-          <label className="block">
-            <span className="mb-1 block font-semibold">Weekly petrol spend (₦)</span>
-            <input className="w-full px-3 py-2" type="number" min={0} inputMode="numeric" placeholder="25000"
-              value={fuel} onChange={(e) => setFuel(e.target.value)} />
-          </label>
-        </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <button className="rounded-xl bg-amber px-5 py-3 font-bold text-[#0b1426] disabled:opacity-50"
-            disabled={loading || !text.trim()} onClick={size}>
-            {loading ? "Sizing…" : "Size my system"}
-          </button>
-          <button className="text-sm text-muted underline" onClick={() => { setText(DEMO); setFuel("25000"); }}>
-            Try the demo shop
-          </button>
-        </div>
-        {error && <p role="alert" className="text-bad">{error}</p>}
-      </section>
+      <main className="relative">
+        <Sizer
+          intro={
+            <>
+              <h1 className="font-display text-[clamp(2.6rem,6vw,4.6rem)] font-extrabold leading-[1.02] tracking-[-0.03em]">
+                Find the solar system your home actually needs.
+              </h1>
+              <p className="mt-6 max-w-[34rem] text-xl leading-relaxed text-muted">
+                Tell us what you want to power. We size the inverter, battery and panels for your city, price them in
+                naira, and show the month solar starts beating your generator.
+              </p>
+              <p className="mt-8 max-w-[34rem] border-l-2 border-amber pl-4 text-foreground/90">
+                Built for the shops and homes that switch on a generator every time the grid goes off.
+              </p>
+            </>
+          }
+        />
 
-      {appliances && (
-        <div className="space-y-6">
-          <ApplianceTable appliances={appliances} onChange={setAppliances} />
-          {sun && <ResultCards appliances={appliances} sunHours={sun.sunHours} source={sun.source} weeklyFuel={Number(fuel)} />}
+        <section className="border-t border-line/60 bg-night/60">
+          <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 px-4 py-20 sm:px-6 lg:grid-cols-12">
+            <h2 className="font-display text-4xl font-bold leading-tight lg:col-span-4">Why buying solar feels like guessing</h2>
+            <ul className="space-y-8 lg:col-span-7 lg:col-start-6">
+              {PROBLEMS.map((p) => (
+                <li key={p.title} className="flex gap-5">
+                  <span aria-hidden className={`mt-2 h-3 w-3 shrink-0 rounded-full ${p.mark}`} />
+                  <div>
+                    <h3 className="text-xl font-bold">{p.title}</h3>
+                    <p className="mt-1 max-w-[36rem] text-lg text-muted">{p.body}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        <section id="how" className="mx-auto max-w-6xl scroll-mt-6 px-4 py-20 sm:px-6">
+          <h2 className="font-display text-4xl font-bold">How it works</h2>
+          <ol className="mt-12 grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+            {STEPS.map((s, i) => (
+              <li key={s.title} className="border-t-2 border-amber/70 pt-5">
+                <span className="font-display text-5xl font-extrabold text-amber/90">{i + 1}</span>
+                <h3 className="mt-3 text-xl font-bold">{s.title}</h3>
+                <p className="mt-2 text-muted">{s.body}</p>
+              </li>
+            ))}
+          </ol>
+          <p className="mt-14 max-w-[42rem] text-lg">
+            The AI only reads your list. Every number on the page comes from formulas you can check, so the same list
+            always gives the same answer.
+          </p>
+        </section>
+      </main>
+
+      <footer className="border-t border-line/60">
+        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-10 text-sm text-muted sm:px-6">
+          <p>
+            Sun data from NASA POWER. Appliance reading by an open model on the NVIDIA API. Prices are estimates for
+            planning. Get a final quote from a certified installer.
+          </p>
+          <p>Made for the Global Energy Hackathon 2026, Digital Solutions, Apps and AI/ML track.</p>
         </div>
-      )}
-    </main>
+      </footer>
+    </div>
   );
 }
