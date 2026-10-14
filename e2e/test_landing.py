@@ -43,7 +43,7 @@ with sync_playwright() as p:
     # Bad input: AI should reject non-appliance text with a clear message.
     page.get_by_role("textbox", name="What do you want to power?").fill("hello")
     size_btn.click()
-    check("nonsense input shows error", lambda: expect(page.get_by_role("alert").filter(has_text="Could not read")).to_be_visible(timeout=60000))
+    check("nonsense input shows error", lambda: expect(page.get_by_role("alert").filter(has_text=re.compile("Could not read|AI is slow"))).to_be_visible(timeout=60000))
     check("empty state invites manual entry", lambda: expect(page.get_by_text("Add at least one appliance")).to_be_visible())
 
     # Happy path: example shop.

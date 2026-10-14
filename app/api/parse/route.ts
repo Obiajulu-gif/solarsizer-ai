@@ -1,3 +1,4 @@
+import { APIConnectionTimeoutError } from "openai";
 import { nvidiaComplete } from "@/lib/nvidia";
 import { ParseError, parseAppliances } from "@/lib/parseAppliances";
 
@@ -13,6 +14,9 @@ export async function POST(request: Request) {
     if (e instanceof ParseError) return Response.json({ error: e.message }, { status: 422 });
     if ((e as { status?: number }).status === 429) {
       return Response.json({ error: "AI is busy, try again in a minute" }, { status: 429 });
+    }
+    if (e instanceof APIConnectionTimeoutError) {
+      return Response.json({ error: "The AI is slow right now. Try again, or add your appliances by hand below." }, { status: 504 });
     }
     console.error("parse failed", e);
     return Response.json({ error: "AI service unavailable, try again or add appliances manually" }, { status: 502 });

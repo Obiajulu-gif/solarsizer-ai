@@ -7,7 +7,8 @@ let client: OpenAI | null = null;
 export const nvidiaComplete: Complete = async (system, user) => {
   const apiKey = process.env.NVIDIA_API_KEY;
   if (!apiKey) throw new Error("NVIDIA_API_KEY is not set");
-  client ??= new OpenAI({ apiKey, baseURL: "https://integrate.api.nvidia.com/v1" });
+  // Free tier sometimes queues for minutes; fail fast with a clear message instead.
+  client ??= new OpenAI({ apiKey, baseURL: "https://integrate.api.nvidia.com/v1", timeout: Number(process.env.NVIDIA_TIMEOUT_MS ?? 30_000), maxRetries: 0 });
   // gpt-oss-20b: available in Nigeria (Meta Llama models are geo-blocked there). Reasoning model, so it needs
   // headroom in max_tokens for its hidden reasoning before the JSON answer.
   const model = process.env.NVIDIA_MODEL ?? "openai/gpt-oss-20b";
