@@ -1,13 +1,28 @@
 "use client";
 
+import { useState } from "react";
+import { parseField } from "@/lib/parseField";
 import type { Appliance } from "@/lib/types";
 
 type Props = { appliances: Appliance[]; onChange: (next: Appliance[]) => void };
 
-const num = (v: string, min: number, max: number, int = false) => {
-  const n = int ? Math.round(Number(v)) : Number(v);
-  return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : min;
-};
+type CellProps = { label: string; value: number; min: number; max: number; step?: number; int?: boolean; width: string;
+  onCommit: (n: number) => void };
+
+/** Number cell that can be blank while typing; valid values apply live, blur restores the last valid value. */
+function NumberCell({ label, value, min, max, step, int, width, onCommit }: CellProps) {
+  const [draft, setDraft] = useState<string | null>(null);
+  return (
+    <input aria-label={label} type="number" min={min} max={max} step={step} className={`${width} px-2 py-1`}
+      value={draft ?? String(value)}
+      onChange={(e) => {
+        setDraft(e.target.value);
+        const n = parseField(e.target.value, min, max, int);
+        if (n !== null) onCommit(n);
+      }}
+      onBlur={() => setDraft(null)} />
+  );
+}
 
 export default function ApplianceTable({ appliances, onChange }: Props) {
   const update = (i: number, patch: Partial<Appliance>) =>
@@ -39,16 +54,13 @@ export default function ApplianceTable({ appliances, onChange }: Props) {
                     onChange={(e) => update(i, { name: e.target.value })} />
                 </td>
                 <td className="pr-2">
-                  <input aria-label="Watts" type="number" min={1} max={5000} className="w-20 px-2 py-1" value={a.watts}
-                    onChange={(e) => update(i, { watts: num(e.target.value, 1, 5000) })} />
+                  <NumberCell label="Watts" value={a.watts} min={1} max={5000} width="w-20" onCommit={(watts) => update(i, { watts })} />
                 </td>
                 <td className="pr-2">
-                  <input aria-label="Hours per day" type="number" min={0} max={24} step={0.5} className="w-20 px-2 py-1" value={a.hours}
-                    onChange={(e) => update(i, { hours: num(e.target.value, 0, 24) })} />
+                  <NumberCell label="Hours per day" value={a.hours} min={0} max={24} step={0.5} width="w-20" onCommit={(hours) => update(i, { hours })} />
                 </td>
                 <td className="pr-2">
-                  <input aria-label="Quantity" type="number" min={1} max={50} className="w-16 px-2 py-1" value={a.qty}
-                    onChange={(e) => update(i, { qty: num(e.target.value, 1, 50, true) })} />
+                  <NumberCell label="Quantity" value={a.qty} min={1} max={50} int width="w-16" onCommit={(qty) => update(i, { qty })} />
                 </td>
                 <td className="pr-2 text-center">
                   <input aria-label="Has a motor" type="checkbox" checked={a.motor} onChange={(e) => update(i, { motor: e.target.checked })} />

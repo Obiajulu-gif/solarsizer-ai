@@ -1,8 +1,16 @@
 import { APIConnectionTimeoutError } from "openai";
 import { nvidiaComplete } from "@/lib/nvidia";
 import { ParseError, parseAppliances } from "@/lib/parseAppliances";
+import { createRateLimiter } from "@/lib/rateLimit";
+
+// Protects the shared free NVIDIA key (about 40 requests/min for the whole account).
+const allow = createRateLimiter(10, 60_000);
 
 export async function POST(request: Request) {
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0].trim() || "local";
+  if (!allow(ip)) {
+    return Response.json({ error: "Too many tries in a minute. Wait a moment, then try again." }, { status: 429 });
+  }
   const body = await request.json().catch(() => null);
   const text = typeof body?.text === "string" ? body.text.trim() : "";
   if (!text || text.length > 500) {

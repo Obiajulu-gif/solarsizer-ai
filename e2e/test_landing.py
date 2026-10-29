@@ -65,6 +65,16 @@ with sync_playwright() as p:
     qty.fill("4")
     check("editing qty changes total", lambda: expect(page.locator("dl div").last).not_to_have_text(total_before))
 
+    # Bug fix: a number cell can be cleared and retyped (it used to snap to the minimum).
+    watts = page.get_by_label("Watts").first
+    watts.fill("")
+    check("watts cell can be blank while typing", lambda: expect(watts).to_have_value(""))
+    watts.press_sequentially("300")
+    check("retyped watts sticks", lambda: expect(watts).to_have_value("300"))
+    watts.fill("")
+    page.get_by_role("heading", name=re.compile("^Your system")).click()  # blur
+    check("blank watts restores last valid value on blur", lambda: expect(watts).to_have_value("300"))
+
     # Removing every row shows the empty state, never NaN.
     for _ in range(page.get_by_label("Appliance name").count()):
         page.get_by_role("button", name=re.compile("^Remove")).first.click()
@@ -80,6 +90,13 @@ with sync_playwright() as p:
     page.get_by_role("combobox", name="City").select_option("kano")
     check("city change updates heading", lambda: expect(page.get_by_role("heading", name="Your system for Kano")).to_be_visible())
 
+    # Bug fix: city change while sun lookup fails falls back to an estimate instead of silently keeping old data.
+    page.route("**/api/sun**", lambda route: route.abort())
+    page.get_by_role("combobox", name="City").select_option("maiduguri")
+    check("offline city change shows estimate", lambda: expect(page.get_by_text(re.compile(r"Our estimate gives your city 6\.2 sun hours"))).to_be_visible())
+    page.unroute("**/api/sun**")
+    check("only Nigerian cities offered", lambda: expect(page.get_by_role("combobox", name="City").locator("option", has_text="Nairobi")).to_have_count(0))
+
     page.screenshot(path=str(SHOTS / "3-full-desktop.png"), full_page=True)
 
     # Mobile layout.
@@ -92,7 +109,7 @@ with sync_playwright() as p:
     m.screenshot(path=str(SHOTS / "4-hero-mobile.png"))
     m.screenshot(path=str(SHOTS / "5-full-mobile.png"), full_page=True)
 
-    check("no JS errors", lambda: (_ for _ in ()).throw(AssertionError("; ".join(errors)[:300])) if [e for e in errors if "422" not in e] else None)
+    check("no JS errors", lambda: (_ for _ in ()).throw(AssertionError("; ".join(errors)[:300])) if [e for e in errors if "422" not in e and "ERR_FAILED" not in e] else None)
     browser.close()
 
 for ok, name in results:

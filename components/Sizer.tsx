@@ -5,6 +5,7 @@ import ApplianceTable from "@/components/ApplianceTable";
 import ResultCards from "@/components/ResultCards";
 import Skyline from "@/components/Skyline";
 import { CITIES } from "@/lib/cities";
+import { fetchSun } from "@/lib/sunClient";
 import type { SunResult } from "@/lib/sun";
 import type { Appliance } from "@/lib/types";
 
@@ -20,8 +21,7 @@ export default function Sizer({ intro }: { intro: ReactNode }) {
   const [loading, setLoading] = useState(false);
 
   async function loadSun(id: string) {
-    const res = await fetch(`/api/sun?city=${id}`);
-    if (res.ok) setSun(await res.json());
+    setSun(await fetchSun(id));
   }
 
   async function size() {
