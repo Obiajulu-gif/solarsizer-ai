@@ -48,14 +48,37 @@ with sync_playwright() as p:
 
     # Happy path: example shop.
     page.get_by_role("button", name="Fill in an example shop").click()
-    check("example fills fuel", lambda: expect(page.get_by_role("spinbutton", name=re.compile("Petrol"))).to_have_value("25000"))
+    check("example fills fuel", lambda: expect(page.get_by_role("spinbutton", name=re.compile("each week"))).to_have_value("25000"))
     size_btn.click()
     check("loading message shown", lambda: expect(page.get_by_text("This takes about 10 seconds")).to_be_visible())
     check("AI returns appliances", lambda: expect(page.get_by_label("Appliance name")).to_have_count(4, timeout=60000))
-    check("results heading names city", lambda: expect(page.get_by_role("heading", name="Your system for Lagos")).to_be_visible())
+    if page.get_by_label("Appliance name").count() == 0:
+        # NVIDIA free tier timed out: carry on the way a user would, with manual rows, so the rest still gets tested.
+        print("note: AI unavailable this run, continuing with manual rows")
+        for _ in range(2):
+            page.get_by_role("button", name="+ Add appliance").click()
+    check("results heading names city", lambda: expect(page.get_by_role("heading", name="Your system for Lagos")).to_be_visible(timeout=15000))
     check("payback sentence", lambda: expect(page.get_by_text(re.compile(r"pays for itself in about \d+ months"))).to_be_visible())
     check("total cost in naira", lambda: expect(page.get_by_text(re.compile(r"₦\s?[\d,]+")).first).to_be_visible())
     check("payback chart rendered", lambda: expect(page.get_by_role("img", name=re.compile("Solar pays back in month"))).to_be_visible())
+
+    # Brief 7 metric: litres of petrol, CO2 and money saved per year.
+    impact = page.get_by_role("region", name="Yearly impact")
+    check("impact shows litres per year", lambda: expect(impact).to_contain_text("1,300"))
+    check("impact shows CO2 tonnes", lambda: expect(impact).to_contain_text("3.0 t"))
+    check("impact shows yearly saving", lambda: expect(impact).to_contain_text(re.compile(r"₦\s?1,300,000")))
+    check("set petrol price 2000", lambda: impact.get_by_role("spinbutton").fill("2000", timeout=5000))
+    check("petrol price change halves litres", lambda: expect(impact).to_contain_text("650"))
+    check("reset petrol price", lambda: impact.get_by_role("spinbutton").fill("1000", timeout=5000))
+
+    # Affordability: monthly instalment next to today's petrol bill.
+    plan = page.get_by_role("region", name="Pay monthly")
+    check("monthly plan shows deposit and instalment", lambda: expect(plan).to_contain_text(re.compile(r"a month for 24 months")))
+    check("monthly plan compares with petrol", lambda: expect(plan).to_contain_text("a month on petrol today"))
+
+    # Low-connectivity sharing: plain-text WhatsApp link, no personal data.
+    wa = page.get_by_role("link", name="Share on WhatsApp")
+    check("WhatsApp link points to wa.me with result", lambda: expect(wa).to_have_attribute("href", re.compile(r"^https://wa\.me/\?text=SolarSizer.*Lagos")))
     page.wait_for_timeout(500)
     page.screenshot(path=str(SHOTS / "2-results-desktop.png"), full_page=False)
 
@@ -83,7 +106,7 @@ with sync_playwright() as p:
 
     # Fuel cleared: payback message changes, no crash.
     page.get_by_role("button", name="+ Add appliance").click()
-    page.get_by_role("spinbutton", name=re.compile("Petrol")).fill("")
+    page.get_by_role("spinbutton", name=re.compile("each week")).fill("")
     check("no fuel shows payback prompt", lambda: expect(page.get_by_text("Enter how much petrol you buy each week")).to_be_visible())
 
     # Changing city refetches sun data.
@@ -99,6 +122,16 @@ with sync_playwright() as p:
 
     page.screenshot(path=str(SHOTS / "3-full-desktop.png"), full_page=True)
 
+    # Manual entry works without calling the AI.
+    page.goto(BASE, timeout=90000)
+    page.get_by_role("heading", level=1).wait_for(timeout=90000)
+    calls = []
+    page.on("request", lambda r: "/api/parse" in r.url and calls.append(r.url))
+    page.get_by_role("button", name="Enter appliances by hand").click()
+    check("manual entry opens a starter row", lambda: expect(page.get_by_label("Appliance name")).to_have_count(1))
+    check("manual entry shows a system", lambda: expect(page.get_by_text("Solar panels")).to_be_visible())
+    check("manual entry made no AI call", lambda: (_ for _ in ()).throw(AssertionError(calls)) if calls else None)
+
     # Mobile layout.
     m = browser.new_page(viewport={"width": 375, "height": 812}, is_mobile=True)
     m.goto(BASE, timeout=90000)
@@ -109,7 +142,7 @@ with sync_playwright() as p:
     m.screenshot(path=str(SHOTS / "4-hero-mobile.png"))
     m.screenshot(path=str(SHOTS / "5-full-mobile.png"), full_page=True)
 
-    check("no JS errors", lambda: (_ for _ in ()).throw(AssertionError("; ".join(errors)[:300])) if [e for e in errors if "422" not in e and "ERR_FAILED" not in e] else None)
+    check("no JS errors", lambda: (_ for _ in ()).throw(AssertionError("; ".join(errors)[:300])) if [e for e in errors if not re.search(r"status of (422|429|504)|ERR_FAILED", e)] else None)
     browser.close()
 
 for ok, name in results:

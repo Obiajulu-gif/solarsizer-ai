@@ -5,6 +5,7 @@ import ApplianceTable from "@/components/ApplianceTable";
 import ResultCards from "@/components/ResultCards";
 import Skyline from "@/components/Skyline";
 import { CITIES } from "@/lib/cities";
+import { DEFAULT_PETROL_PRICE } from "@/lib/impact";
 import { fetchSun } from "@/lib/sunClient";
 import type { SunResult } from "@/lib/sun";
 import type { Appliance } from "@/lib/types";
@@ -15,6 +16,7 @@ export default function Sizer({ intro }: { intro: ReactNode }) {
   const [text, setText] = useState("");
   const [cityId, setCityId] = useState("lagos");
   const [fuel, setFuel] = useState("");
+  const [petrolPrice, setPetrolPrice] = useState(String(DEFAULT_PETROL_PRICE));
   const [appliances, setAppliances] = useState<Appliance[] | null>(null);
   const [sun, setSun] = useState<SunResult | null>(null);
   const [error, setError] = useState("");
@@ -41,13 +43,23 @@ export default function Sizer({ intro }: { intro: ReactNode }) {
         requestAnimationFrame(() => document.getElementById("results")?.scrollIntoView({ block: "start" }));
       }
     } catch {
-      setError("No connection. Check your internet and try again.");
+      setError(navigator.onLine === false
+        ? "You are offline, so the AI cannot read your list. Enter your appliances by hand below."
+        : "No connection. Check your internet and try again, or enter your appliances by hand below.");
+      setAppliances((a) => a ?? []);
     } finally {
       setLoading(false);
     }
   }
 
-  const cityName = CITIES.find((c) => c.id === cityId)?.name;
+  async function enterByHand() {
+    setError("");
+    setAppliances((a) => (a && a.length ? a : [{ name: "Appliance", watts: 100, hours: 4, qty: 1, motor: false }]));
+    await loadSun(cityId);
+    requestAnimationFrame(() => document.getElementById("results")?.scrollIntoView({ block: "start" }));
+  }
+
+  const cityName = CITIES.find((c) => c.id === cityId)?.name ?? "";
 
   return (
     <>
@@ -85,6 +97,10 @@ export default function Sizer({ intro }: { intro: ReactNode }) {
                   onClick={() => { setText(DEMO); setFuel("25000"); }}>
                   Fill in an example shop
                 </button>
+                <button className="text-muted underline decoration-line decoration-2 underline-offset-4 hover:text-foreground"
+                  onClick={enterByHand}>
+                  Enter appliances by hand
+                </button>
               </div>
               <p className="mt-4 min-h-6 text-sm text-muted" aria-live="polite">
                 {loading ? "The AI is reading your list. This takes about 10 seconds." : ""}
@@ -103,7 +119,10 @@ export default function Sizer({ intro }: { intro: ReactNode }) {
               Your system{cityName ? ` for ${cityName}` : ""}
             </h2>
             <div className="mt-8 space-y-6">
-              {sun && <ResultCards appliances={appliances} sunHours={sun.sunHours} source={sun.source} weeklyFuel={Number(fuel)} />}
+              {sun && (
+                <ResultCards appliances={appliances} sunHours={sun.sunHours} source={sun.source} weeklyFuel={Number(fuel)}
+                  city={cityName} petrolPrice={petrolPrice} onPetrolPriceChange={setPetrolPrice} />
+              )}
               <ApplianceTable appliances={appliances} onChange={setAppliances} />
             </div>
           </section>

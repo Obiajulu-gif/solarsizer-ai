@@ -2,7 +2,7 @@
 
 **Right-size your solar. Kill the generator bill.**
 
-Global Energy Hackathon 2026, Digital Solutions, Apps & AI/ML track.
+Global Energy Hackathon 2026. Track 2, Digital Solutions & AI. Brief 7, Replace diesel for productive use.
 
 ## Problem
 
@@ -14,6 +14,13 @@ Millions of Nigerian homes and shops run petrol generators because the grid fail
 2. **Sizing engine.** Pure TypeScript, unit-tested. The AI never does the math.
 3. **Sun data.** Annual peak sun hours for your city from NASA POWER, so Kano and Lagos get different panel counts.
 4. **Price and payback.** System cost from a local price table, compared with your weekly petrol spend to get the payback month.
+5. **Brief 7 impact.** Litres of petrol and tonnes of CO2 avoided per year (2.31 kg CO2 per litre), yearly petrol saving, 5-year net saving.
+6. **Affordability.** Monthly payment with example pay-as-you-go terms (10% deposit, 24% a year, 24 months), next to today's petrol bill.
+7. **Low connectivity.** Share the result on WhatsApp as plain text. Works offline after the first visit (service worker); enter appliances by hand without the AI.
+
+Free for shops and homes. The business model: installers and pay-as-you-go providers pay per qualified sizing request.
+
+Submission drafts: `docs/one-page-summary.md`, `docs/pitch-deck-outline.md`, `docs/demo-script.md`, `docs/disclosure.md`. Prior work and sprint work: `CHANGELOG.md`.
 
 ### Formulas
 
@@ -39,6 +46,8 @@ npm install
 cp .env.example .env.local   # then paste your NVIDIA key into .env.local
 npm run dev                  # http://localhost:3000
 npm test                     # unit tests
+python e2e/test_landing.py   # browser tests (dev server on :3023, needs Playwright)
+python e2e/test_offline.py   # offline tests (production server on :3025)
 ```
 
 Get a free NVIDIA key at https://build.nvidia.com (sign in, open a model page, "Get API Key"). Keys start with `nvapi-`. Never commit `.env.local`.

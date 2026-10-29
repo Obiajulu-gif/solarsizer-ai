@@ -11,7 +11,13 @@ const STEPS = [
   { title: "Describe it", body: "Type what you own the way you would say it. The AI turns it into a list you can edit." },
   { title: "Size it", body: "Tested formulas size the inverter for start-up load, the battery for the night and the panels for the day." },
   { title: "Match your sun", body: "NASA satellite data gives the real sun hours for your city. Kano needs fewer panels than Lagos." },
-  { title: "Price it", body: "A local price table gives the cost, and your petrol spend gives the month solar pays for itself." },
+  { title: "Price it", body: "A local price table gives the cost and a monthly payment option. Your petrol spend gives the payback month, the litres saved and the CO₂ avoided." },
+];
+
+const ACCESS = [
+  { title: "Free for shops and homes", body: "No sign-up and no fee. Installers and pay-as-you-go providers are the ones who benefit from ready-sized requests." },
+  { title: "Works on a weak network", body: "After your first visit the page opens offline. Enter appliances by hand and it still sizes your system." },
+  { title: "Share on WhatsApp", body: "Send your result as plain text to an installer or a family member on any phone, then compare their quote with it." },
 ];
 
 export default function Home() {
@@ -56,6 +62,20 @@ export default function Home() {
                 </li>
               ))}
             </ul>
+          </section>
+
+          <section className="border-t border-line">
+            <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 lg:py-24">
+              <h2 className="font-display text-[clamp(2rem,4vw,3.2rem)] font-extrabold tracking-tight">Made for the way people actually buy</h2>
+              <ul className="mt-12 grid grid-cols-1 gap-x-10 gap-y-10 md:grid-cols-3">
+                {ACCESS.map((a) => (
+                  <li key={a.title} className="border-l-4 border-sun pl-5">
+                    <h3 className="font-display text-2xl font-bold">{a.title}</h3>
+                    <p className="mt-2 text-lg leading-relaxed text-muted">{a.body}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </section>
 
           <section id="how" className="scroll-mt-4 border-t border-line">
