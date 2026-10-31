@@ -2,6 +2,8 @@
 
 **Right-size your solar. Kill the generator bill.**
 
+Live app: https://solarsizer-ai.vercel.app
+
 Global Energy Hackathon 2026. Track 2, Digital Solutions & AI. Brief 7, Replace diesel for productive use.
 
 ## Problem
