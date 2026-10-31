@@ -19,12 +19,22 @@ The tag and commits are dated Oct 29, 2026, but the repository was first pushed 
 
 ## What we built during the sprint
 
-<!-- Fill in during the sprint. Examples: real installer price data, interviews with shop owners,
-     comparison of SolarSizer results with real installer quotes, pilot plan, demo and pitch videos. -->
+- Upgraded Next.js from 16.4.0 to 16.4.3 (security patch)
+- First GitHub push and public Vercel deployment (https://solarsizer-ai.vercel.app)
+- Ran the browser and offline test suites against the live site
+- Produced the demo video, pitch video, deck and one-page summary
+
+Not done yet: equipment prices are still placeholders, and results have not been compared with real installer quotes
+or checked with shop owners. The impact figures are modelled for an example shop.
+
+## Videos
+
+- Narration in both videos is an AI voice (Kokoro, through HyperFrames). The screen footage is a recording of the live app.
+- The screen recording is retimed in places to fit the narration. In the demo, the AI result shown came from the live app during that recording.
 
 ## AI tools used
 
-- Claude Code (Anthropic) to help write code, tests and documents
+- Claude Code (Anthropic) to help write code, tests, documents and the videos
 - NVIDIA API Catalog, model `openai/gpt-oss-20b`, inside the app to turn a typed appliance list into structured data.
   The model does no calculations; all numbers come from the tested sizing code.
 

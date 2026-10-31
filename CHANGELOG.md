@@ -29,3 +29,4 @@ is listed separately below, with commit times as evidence.
 <!-- Add one line per change with the time (ET). Judges compare this with commit times. -->
 
 - Oct 31, 05:40 AM ET: upgraded Next.js to 16.4.3 (security patch); first push to GitHub and first Vercel deployment
+- Oct 31, 08:25 AM ET: produced the submission package: demo video, pitch video, deck and one-page summary; updated the disclosure statement

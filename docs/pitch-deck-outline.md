@@ -23,7 +23,7 @@ with placeholder prices; replace them with sourced figures before export.
 - Answers: *What did you build this weekend?*
 
 ## 4. Cost, who pays, and the 6–18 month plan
-- System about ₦2.43M, or ₦243,000 down then about ₦115,630 a month for 24 months, against about ₦108,333 of
+- System about ₦2.43M, or ₦243,000 down then about ₦115,629 a month for 24 months, against about ₦108,333 of
   petrol a month today.
 - Free for shops and homes. Installers and pay-as-you-go providers pay per qualified request.
 - Months 0–6 pilot with 50 shops; 6–12 first pay-as-you-go partner; 12–18 nationwide.
