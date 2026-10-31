@@ -15,6 +15,8 @@ The working web app, tagged in the repository as `prior-work-2026-10-29`:
 
 See `CHANGELOG.md` for dates.
 
+The tag and commits are dated Oct 29, 2026, but the repository was first pushed to GitHub on Oct 31, 2026, during the sprint.
+
 ## What we built during the sprint
 
 <!-- Fill in during the sprint. Examples: real installer price data, interviews with shop owners,

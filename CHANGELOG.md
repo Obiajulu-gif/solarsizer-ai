@@ -27,3 +27,5 @@ is listed separately below, with commit times as evidence.
 ## During the sprint
 
 <!-- Add one line per change with the time (ET). Judges compare this with commit times. -->
+
+- Oct 31, 05:40 AM ET: upgraded Next.js to 16.4.3 (security patch); first push to GitHub and first Vercel deployment
