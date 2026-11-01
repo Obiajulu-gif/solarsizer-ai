@@ -1,6 +1,4 @@
-# Disclosure statement (draft)
-
-Paste into the submission portal's disclosure form. Update the "built during the sprint" section before submitting.
+# Disclosure statement
 
 ## What existed before the event (Oct 30, 2026, 12:00 PM ET)
 
@@ -30,13 +28,13 @@ or checked with shop owners. The impact figures are modelled for an example shop
 
 ## Videos
 
-- Narration in both videos is an AI voice (Kokoro, through HyperFrames). The screen footage is a recording of the live app.
-- The screen recording is retimed in places to fit the narration. In the demo, the AI result shown came from the live app during that recording.
+- The demo video presenter, Ada, is an illustrated character with an AI voice (Kokoro, through HyperFrames). She is not a real person.
+- The pitch video narration is also an AI voice. The app footage is a recording of the live site, retimed in places to fit the narration.
 
 ## AI tools used
 
 - Claude Code (Anthropic) to help write code, tests, documents and the videos
-- NVIDIA API Catalog, model `nvidia/nemotron-3.5-lightning-30b-a3b`, inside the app to turn a typed appliance list into structured data. The demo video was recorded earlier with `openai/gpt-oss-20b`.
+- NVIDIA API Catalog, model `nvidia/nemotron-3.5-lightning-30b-a3b`, inside the app to turn a typed appliance list into structured data.
   The model does no calculations; all numbers come from the tested sizing code.
 
 ## Open-source code and libraries

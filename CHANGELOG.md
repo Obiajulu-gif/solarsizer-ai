@@ -31,3 +31,4 @@ is listed separately below, with commit times as evidence.
 - Oct 31, 05:40 AM ET: upgraded Next.js to 16.4.3 (security patch); first push to GitHub and first Vercel deployment
 - Oct 31, 08:25 AM ET: produced the submission package: demo video, pitch video, deck and one-page summary; updated the disclosure statement
 - Nov 01, 09:27 AM ET: switched the AI to NVIDIA Nemotron Lightning with thinking off after the previous model timed out on every live test; stopped the AI inventing appliances for text with none
+- Nov 01, 09:48 AM ET: re-recorded the demo with an illustrated presenter; added team lead details to the deck and summary; published both PDFs on the live site for judges
