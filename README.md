@@ -37,7 +37,7 @@ Submission drafts: `docs/one-page-summary.md`, `docs/pitch-deck-outline.md`, `do
 
 ## Data sources and credits
 
-- **AI:** `openai/gpt-oss-20b` (default) via NVIDIA API Catalog (build.nvidia.com), OpenAI-compatible endpoint. Meta Llama models are geo-blocked in Nigeria; run `node scripts/check-models.mjs` to see which models answer from your location, then set `NVIDIA_MODEL`.
+- **AI:** `nvidia/nemotron-3.5-lightning-30b-a3b` (default, thinking off) via NVIDIA API Catalog (build.nvidia.com), OpenAI-compatible endpoint. Meta Llama models are geo-blocked in Nigeria; run `node scripts/check-models.mjs` to see which models answer from your location, then set `NVIDIA_MODEL`.
 - **Sun hours:** NASA POWER climatology API, parameter `ALLSKY_SFC_SW_DWN` (annual mean). Falls back to an approximate value per city if NASA is unreachable, labelled "estimate".
 - **Prices:** `lib/prices.json`. Placeholder Lagos retail estimates; replace with researched prices and their date before demo.
 

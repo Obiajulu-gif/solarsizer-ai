@@ -23,6 +23,7 @@ The tag and commits are dated Oct 29, 2026, but the repository was first pushed 
 - First GitHub push and public Vercel deployment (https://solarsizer-ai.vercel.app)
 - Ran the browser and offline test suites against the live site
 - Produced the demo video, pitch video, deck and one-page summary
+- Switched the AI model to fix live timeouts, and stopped it inventing appliances for text with none
 
 Not done yet: equipment prices are still placeholders, and results have not been compared with real installer quotes
 or checked with shop owners. The impact figures are modelled for an example shop.
@@ -35,7 +36,7 @@ or checked with shop owners. The impact figures are modelled for an example shop
 ## AI tools used
 
 - Claude Code (Anthropic) to help write code, tests, documents and the videos
-- NVIDIA API Catalog, model `openai/gpt-oss-20b`, inside the app to turn a typed appliance list into structured data.
+- NVIDIA API Catalog, model `nvidia/nemotron-3.5-lightning-30b-a3b`, inside the app to turn a typed appliance list into structured data. The demo video was recorded earlier with `openai/gpt-oss-20b`.
   The model does no calculations; all numbers come from the tested sizing code.
 
 ## Open-source code and libraries

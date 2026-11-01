@@ -27,3 +27,9 @@ test("motor defaults to false", async () => {
   const r = await parseAppliances("tv", async () => '[{"name":"TV","watts":100,"hours":6,"qty":1}]');
   expect(r[0].motor).toBe(false);
 });
+
+test("an empty list from the model is a clear failure, not an empty system", async () => {
+  let calls = 0;
+  await expect(parseAppliances("hello", async () => (calls++, "[]"))).rejects.toThrow(ParseError);
+  expect(calls).toBe(2);
+});

@@ -9,7 +9,8 @@ export const SYSTEM_PROMPT =
   "Extract household or shop appliances from the user's text. Reply with ONLY a JSON array, no prose. " +
   "Each item: name (string), watts (typical rated watts for one unit in Nigeria), hours (hours of use per day), " +
   "qty (integer), motor (true for fridges, freezers, pumps, air conditioners, washing machines). " +
-  "For fridges and freezers use about 10 effective hours. If hours are not stated, use typical daily use.";
+  "For fridges and freezers use about 10 effective hours. If hours are not stated, use typical daily use. " +
+  "Only include appliances the user actually mentions. If the text names no appliances, reply with [].";
 
 export const ApplianceSchema = z.object({
   name: z.string().trim().min(1).max(60),
